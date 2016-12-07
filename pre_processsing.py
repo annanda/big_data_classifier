@@ -10,13 +10,24 @@ def eliminando_colunas_mesmo_valor():
         quantidade_valor = len(data[key_data].value_counts())
         if quantidade_valor != 1:
             d[key_data] = data[key_data].values
-        if quantidade_valor == 2:
-            print("Key: {}, valores: {}".format(key_data, data[key_data].value_counts()))
+        # if quantidade_valor == 2:
+            # print("Key: {}, valores: {}".format(key_data, data[key_data].value_counts()))
 
     # diminuiu de 370 colunas para 336 colunas
     new_data = pd.DataFrame(d)
-    print(new_data)
+    new_data.to_csv('dataset/train_colunas_limpas.csv')
+
+
+def eliminando_outliers():
+    data = pd.read_csv('dataset/train_colunas_limpas.csv')
+    keys_data = data.keys()
+    d = {}
+    for key_data in keys_data:
+        quantidade_valor = len(data[key_data].value_counts())
+        if quantidade_valor == 2:
+            print("Key: {}, valores: {}".format(key_data, data[key_data].value_counts()))
 
 
 if __name__ == '__main__':
     eliminando_colunas_mesmo_valor()
+    eliminando_outliers()
