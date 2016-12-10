@@ -1,8 +1,10 @@
 import pandas as pd
 from sklearn.cluster import KMeans
+import scipy
+from sklearn import preprocessing
 
 
-def eliminando_colunas_mesmo_valor():
+def elimina_colunas_mesmo_valor():
     data = pd.read_csv('dataset/train_file.csv')
     keys_data = data.keys()
     selected_keys = []
@@ -18,7 +20,8 @@ def eliminando_colunas_mesmo_valor():
     selected_keys.remove('TARGET')
     return selected_keys
 
-def eliminando_colunas_test_set(selected_keys):
+
+def elimina_colunas_test_set(selected_keys):
     test = pd.read_csv('dataset/test_file.csv')
     d = {}
     for key_data in selected_keys:
@@ -26,9 +29,6 @@ def eliminando_colunas_test_set(selected_keys):
     new_data = pd.DataFrame(d)
     new_data.to_csv('dataset/test_colunas_limpas.csv')
 
-# def correlacao_pearson():
-#     data = pd.read_csv('dataset/train_colunas_limpas_2.csv')
-#     data.T.corr(method='spearman')
 
 def usando_k_means():
     dataset = pd.read_csv('dataset/train_colunas_limpas_2.csv')
@@ -65,7 +65,7 @@ def usando_k_means():
     test.to_csv('dataset/test_kmeans_2clusters.csv')
 
 
-def eliminando_exemplos_ruins():
+def elimina_exemplos_ruins():
     dataset = pd.read_csv('dataset/train_colunas_limpas_2.csv')
     dataset = dataset.drop('Unnamed: 0', 1)
     keys_data = dataset.keys()
@@ -84,8 +84,65 @@ def eliminando_exemplos_ruins():
     dataset.to_csv('dataset/train_limpando_linhas.csv')
 
 
+def descobre_colunas_mesmo_valor(df):
+    keys_data = df.keys()
+    to_delete = []
+    for key_data in keys_data:
+        contagem = df[key_data].value_counts()
+        quantidade_valores = len(contagem)
+        if quantidade_valores > 1 and (contagem.iloc[0] > 70015 or contagem.iloc[1] > 70015):
+            to_delete.append(key_data)
+    return to_delete
+
+
+def descobre_colunas_pearson(df, train=1):
+    to_delete = []
+    keys_df = df.keys()
+
+    x = df.values
+    min_max_scaler = preprocessing.MinMaxScaler()
+    x_scaled = min_max_scaler.fit_transform(x)
+    df = pd.DataFrame(x_scaled)
+    df.columns = keys_df[:]
+
+    if train:
+        range_colunas = len(df.columns)-1
+    else:
+        range_colunas = len(df.columns)
+    for i in range(range_colunas):
+        for j in range(i+1, range_colunas):
+            corr, value = scipy.stats.pearsonr(df.ix[:,i:i+1], df.ix[:,j:j+1])
+            if(corr > 0.9 or corr*-1 > 0.9):
+                to_delete.extend(df.ix[:,i:i+1].keys())
+                break
+
+    return to_delete
+
+
+def apaga_colunas(list_to_delete, df, df_name_export):
+    for key in list_to_delete:
+        df = df.drop(key, 1)
+
+    df.to_csv('dataset/' + df_name_export)
+
+
 if __name__ == '__main__':
-    # selectec_keys = eliminando_colunas_mesmo_valor()
-    # eliminando_colunas_test_set(selectec_keys)
-    # usando_k_means()
-    eliminando_exemplos_ruins()
+    df = pd.read_csv('dataset/train_file.csv')
+    df_name_export = 'colunas_apagadas_pearson_refatorada.csv'
+    to_delete = descobre_colunas_pearson(df)
+    print('To delete: {}'.format(to_delete))
+    apaga_colunas(to_delete, df, df_name_export)
+
+    df_2 = pd.read_csv('dataset/colunas_apagadas_pearson_refatorada.csv')
+    df_2.drop('Unnamed: 0', 1)
+
+    to_delete_2 = descobre_colunas_mesmo_valor(df_2)
+    print('To delete 2: {}'.format(to_delete_2))
+
+    apaga_colunas(to_delete_2, df_2, 'colunas_apagadas_mesmo_valor.csv')
+
+    test = pd.read_csv('dataset/test_file.csv')
+    to_delete_test = to_delete + to_delete_2
+    print('to delete test')
+    print(to_delete_test)
+    apaga_colunas(to_delete_test, test, 'teste_processado.csv')
