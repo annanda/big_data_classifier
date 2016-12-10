@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import scipy
 
@@ -37,6 +36,6 @@ def apaga_colunas_pearson(to_delete, df, df_name_export):
 
 if __name__ == '__main__':
     df = pd.read_csv('dataset/train_file.csv')
-    df_name_export = 'colunas_apagadas_pearson.csv'
+    df_name_export = 'colunas_apagadas_pearson_refatorada.csv'
     to_delete = colunas_apagar_pearson(df)
     apaga_colunas_pearson(to_delete, df, df_name_export)
