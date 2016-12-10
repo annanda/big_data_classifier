@@ -14,7 +14,7 @@ def eliminando_colunas_mesmo_valor():
             d[key_data] = data[key_data].values
             selected_keys.append(key_data)
     new_data = pd.DataFrame(d)
-    new_data.to_csv('dataset/train_colunas_limpas_2.csv')
+    new_data.to_csv('dataset/train_colunas_limpas_nova.csv')
     selected_keys.remove('TARGET')
     return selected_keys
 
@@ -32,10 +32,12 @@ def eliminando_colunas_test_set(selected_keys):
 
 def usando_k_means():
     dataset = pd.read_csv('dataset/train_colunas_limpas_2.csv')
+    #apagando uma coluna fantasma de indices
+    dataset = dataset.drop('Unnamed: 0', 1)
     test = pd.read_csv('dataset/test_colunas_limpas.csv')
+    test = test.drop('Unnamed: 0', 1)
 
     x = dataset.values[:, :-1]
-    y = dataset['TARGET']
 
     x_test = test.values[:, :]
     kmeans = KMeans(n_clusters=2).fit_predict(x)
@@ -62,7 +64,28 @@ def usando_k_means():
     dataset.to_csv('dataset/train_kmeans_2clusters.csv')
     test.to_csv('dataset/test_kmeans_2clusters.csv')
 
+
+def eliminando_exemplos_ruins():
+    dataset = pd.read_csv('dataset/train_colunas_limpas_2.csv')
+    dataset = dataset.drop('Unnamed: 0', 1)
+    keys_data = dataset.keys()
+    keys_data = list(keys_data)
+    keys_data.remove('TARGET')
+    for key_data in keys_data:
+        media = dataset[key_data].mean()
+        desvio_padrao = dataset[key_data].std()
+        coluna = dataset[key_data]
+        for i in range(len(coluna)):
+            if coluna[i]:
+                if (coluna[i] - media) > desvio_padrao:
+                    print("Linha: {}, valor da linha: {}\n".format(i, coluna[i], key_data))
+                    print("chave: {}, media: {}, desvio_padrao: {}\n\n".format( key_data, media, desvio_padrao))
+                    dataset.drop(dataset.index[[i]])
+    dataset.to_csv('dataset/train_limpando_linhas.csv')
+
+
 if __name__ == '__main__':
     # selectec_keys = eliminando_colunas_mesmo_valor()
     # eliminando_colunas_test_set(selectec_keys)
-    usando_k_means()
+    # usando_k_means()
+    eliminando_exemplos_ruins()
