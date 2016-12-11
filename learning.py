@@ -5,11 +5,8 @@ from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, Gradi
 from sklearn.tree import DecisionTreeClassifier
 
 def try_classifier(clf, tag):
-    dataset = pd.read_csv('dataset/colunas_apagadas_mesmo_valor.csv')
-    dataset.drop('Unnamed: 0', 1)
-    dataset = dataset.drop('Unnamed: 0.1', 1)
+    dataset = pd.read_csv('dataset/colunas_apagadas_mesmo_valor_exclui_linhas_menor_zero.csv')
     test = pd.read_csv('dataset/teste_processado.csv')
-    test.drop('Unnamed: 0', 1)
 
     x = dataset.values[:,:-1]
     y = dataset['TARGET']
@@ -22,10 +19,13 @@ def try_classifier(clf, tag):
     scores = cross_val_score(clf, x, y, scoring='roc_auc')
     print("Auc (%s): %0.3f (+/- %0.3f)" % (tag, scores.mean(), scores.std() * 2))
 
-    with open('GB_pos_pearson.txt', 'w') as file:
+    with open( tag + '.txt', 'w') as file:
         for line in predictions:
             file.write(str(line[1]) + '\n')
 
 
 if __name__ == '__main__':
-    try_classifier(GradientBoostingClassifier(), 'gb')
+    try_classifier(GradientBoostingClassifier(), 'gb_linhas_excluidas')
+    try_classifier(RandomForestClassifier(), 'random_linhas_excluidas')
+    try_classifier(ExtraTreesClassifier(), 'extra_tree_linhas_excluidas')
+    try_classifier(DecisionTreeClassifier(), 'decition_linhas_excluidas')
