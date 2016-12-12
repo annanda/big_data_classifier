@@ -33,4 +33,20 @@ excluindo as linhas de valores ruins da coluna var3, se target não for 1.
 houve uma melhora
 De 0.840261 para 0.841493.
 
+Auc (gradientboosting_min_samples_split_3): 0.836 (+/- 0.009)
 
+Auc (gradientboosting_max_features_1): 0.783 (+/- 0.016)
+Auc (gradientboosting_max_features_3): 0.805 (+/- 0.005)
+Auc (gradientboosting_max_features_auto): 0.835 (+/- 0.009)
+Auc (gradientboosting_max_features_sqrt): 0.832 (+/- 0.005)  --> melhor resultado
+Auc (gradientboosting_max_features_log2): 0.818 (+/- 0.016)
+
+
+Rede Neural:
+Não consegui =(
+
+Undersampling 50/50 -> Não melhorou
+Auc (gb_undersampling): 0.828 (+/- 0.024)
+Auc (gradientboosting_max_features_sqrt_undersampling): 0.824 (+/- 0.025)
+
+Melhor resultado foi com undersampling, pegando quantidade de exemplos 0 igual a 2.5 vezes o numero de exemplos 1.

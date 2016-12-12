@@ -173,6 +173,6 @@ if __name__ == '__main__':
     # apaga_colunas(to_delete_test, test, 'c')
     # usando_k_means()
     # elimina_exemplos_ruins()
-    row_delete = lista_linhas_valores_menor_1('colunas_apagadas_mesmo_valor_exclui_linhas.csv')
-    apaga_linhas(row_delete, 'colunas_apagadas_mesmo_valor_exclui_linhas.csv', 'cc.csv')
+    row_delete = lista_linhas_valores_ruins(-999999, 'var3', 'colunas_apagadas_mesmo_valor.csv')
+    apaga_linhas(row_delete, 'colunas_apagadas_mesmo_valor.csv', 'colunas_apagadas_exclui_linhas_valor_ruim.csv')
     # apaga_colunas(['Unnamed: 0'], 'teste_processado.csv', 'teste_processado.csv')
